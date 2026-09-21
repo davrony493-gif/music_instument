@@ -28,7 +28,7 @@ class Taskcard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isDark ? Appcolors.grey900 : Appcolors.white,
-        borderRadius: radius,
+        borderRadius:BorderRadius.circular(20) ,
         border: Border.all(color: mutedSurface),
         boxShadow: [
           BoxShadow(
@@ -108,27 +108,18 @@ class Taskcard extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          trailing: Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: mutedSurface,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              // chevron-down.svg rotated three quarter turns points right.
-              child: RotatedBox(
-                quarterTurns: 3,
-                child: SvgPicture.asset(
-                  Assets.icons.chevronDown.path,
-                  width: 16,
-                  height: 16,
-                  colorFilter: ColorFilter.mode(
-                    Appcolors.grey500,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
+         
+          trailing: IconButton(
+            onPressed: onTap,
+            icon: const Icon(Icons.chevron_right_rounded),
+            iconSize: 18,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+            style: IconButton.styleFrom(
+              backgroundColor: mutedSurface,
+              foregroundColor: Appcolors.grey500,
+              shape: const CircleBorder(),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
           ),
         ),

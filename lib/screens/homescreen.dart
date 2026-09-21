@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:music_intrument/consts/colors/appcolors.dart';
@@ -111,91 +112,58 @@ class _HomescreenState extends State<Homescreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-                  TextField(
+                  CupertinoSearchTextField(
                     controller: _searchController,
                     focusNode: _searchFocusNode,
-                    textInputAction: TextInputAction.search,
-                    cursorColor: Appcolors.primaryColor,
                     onChanged: _onSearchChanged,
                     onSubmitted: _onSearchSubmitted,
+                    placeholder: 'Search (notes, tasks)',
+                    placeholderStyle: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: Appcolors.grey500,
+                    ),
                     style: TextStyle(
                       fontFamily: 'Inter',
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                       color: isDark ? Appcolors.white : Appcolors.grey900,
                     ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: isDark ? Appcolors.grey800 : Appcolors.grey100,
-                      isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 15),
-                      hintText: 'Search (notes, tasks)',
-                      hintStyle: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 15,
-                        fontWeight: FontWeight.w400,
-                        color: Appcolors.grey500,
-                      ),
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.only(left: 16, right: 12),
-                        child: SvgPicture.asset(
-                          Assets.icons.search.path,
-                          width: 20,
-                          height: 20,
-                          colorFilter: ColorFilter.mode(
-                            iconColor,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                      ),
-                      prefixIconConstraints: const BoxConstraints(
-                        minWidth: 0,
-                        minHeight: 0,
-                      ),
-                      suffixIcon: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: _query.isEmpty
-                            ? _startVoiceSearch
-                            : _clearSearch,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(12, 12, 16, 12),
-                          child: _query.isEmpty
-                              ? SvgPicture.asset(
-                                  Assets.icons.voice.path,
-                                  width: 20,
-                                  height: 20,
-                                  colorFilter: ColorFilter.mode(
-                                    iconColor,
-                                    BlendMode.srcIn,
-                                  ),
-                                )
-                              : Icon(
-                                  Icons.close_rounded,
-                                  size: 20,
-                                  color: Appcolors.grey500,
-                                ),
-                        ),
-                      ),
-                      suffixIconConstraints: const BoxConstraints(
-                        minWidth: 0,
-                        minHeight: 0,
-                      ),
-
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: const BorderSide(
-                          color: Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(
-                          color: Appcolors.primaryColor,
-                          width: 2,
-                        ),
+                    cursorColor: Appcolors.primaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 17),
+                    decoration: BoxDecoration(
+                      color: isDark ? Appcolors.grey800 : Appcolors.grey100,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: _isSearchFocused
+                            ? Appcolors.primaryColor
+                            : Colors.transparent,
+                        width: 2,
                       ),
                     ),
+                    prefixInsets: const EdgeInsetsDirectional.only(
+                      start: 16,
+                      end: 12,
+                    ),
+                    prefixIcon: SvgPicture.asset(
+                      Assets.icons.search.path,
+                      width: 20,
+                      height: 20,
+                      colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                    ),
+                    // Mic while empty, clear button once there is text.
+                    suffixMode: OverlayVisibilityMode.always,
+                    suffixIcon: _query.isEmpty
+                        ? Icon(CupertinoIcons.mic, color: iconColor)
+                        : Icon(
+                            CupertinoIcons.xmark_circle_fill,
+                            color: Appcolors.grey500,
+                          ),
+                    onSuffixTap: _query.isEmpty
+                        ? _startVoiceSearch
+                        : _clearSearch,
+                    suffixInsets: const EdgeInsetsDirectional.only(end: 16),
                   ),
                   const SizedBox(height: 24),
                   Row(

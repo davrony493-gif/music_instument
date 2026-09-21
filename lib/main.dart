@@ -1,7 +1,9 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:music_intrument/consts/themes/appthemes.dart';
+import 'package:music_intrument/providers/sign_up_provider.dart';
 import 'package:music_intrument/screens/signup.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(Myapp());
@@ -20,7 +22,10 @@ class Myapp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: theme,
         darkTheme: darkTheme,
-        home: Signup(),
+        home: ChangeNotifierProvider(
+          create: (_) => SignUpProvider(),
+          child: Signup(),
+        ),
       ),
     );
   }

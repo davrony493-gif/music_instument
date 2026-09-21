@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:music_intrument/consts/colors/appcolors.dart';
 
-/// Weekly practice summary: a progress ring next to the remaining time and
-/// a day-by-day breakdown of the week.
+
 class Practicecard extends StatelessWidget {
   const Practicecard({
     super.key,

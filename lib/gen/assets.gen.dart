@@ -17,6 +17,9 @@ import 'package:vector_graphics/vector_graphics.dart' as _vg;
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
+  /// File path: assets/icons/SVG.svg
+  SvgGenImage get svg => const SvgGenImage('assets/icons/SVG.svg');
+
   /// File path: assets/icons/arrow-right.svg
   SvgGenImage get arrowRight =>
       const SvgGenImage('assets/icons/arrow-right.svg');
@@ -75,6 +78,7 @@ class $AssetsIconsGen {
 
   /// List of all assets
   List<SvgGenImage> get values => [
+    svg,
     arrowRight,
     check,
     chevronDown,
