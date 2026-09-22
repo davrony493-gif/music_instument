@@ -3,93 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:music_intrument/consts/colors/appcolors.dart';
 import 'package:music_intrument/gen/assets.gen.dart';
+import 'package:music_intrument/providers/homescreen_provider.dart';
 import 'package:music_intrument/widgets/practicecard.dart';
 import 'package:music_intrument/widgets/taskcard.dart';
+import 'package:provider/provider.dart';
 
-class Homescreen extends StatefulWidget {
+class Homescreen extends StatelessWidget {
   const Homescreen({super.key, required this.userName});
 
   final String userName;
 
   @override
-  State<Homescreen> createState() => _HomescreenState();
-}
-
-class _HomescreenState extends State<Homescreen> {
-  final TextEditingController _searchController = TextEditingController();
-  final FocusNode _searchFocusNode = FocusNode();
-
-  bool _isSearchFocused = false;
-  String _query = '';
-
-  @override
-  void initState() {
-    super.initState();
-
-    _searchFocusNode.addListener(() {
-      setState(() {
-        _isSearchFocused = _searchFocusNode.hasFocus;
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _searchFocusNode.dispose();
-    super.dispose();
-  }
-
-  void _onSearchChanged(String value) {
-    setState(() {
-      _query = value;
-    });
-  }
-
-  void _onSearchSubmitted(String value) {
-    _searchFocusNode.unfocus();
-  }
-
-  void _clearSearch() {
-    _searchController.clear();
-    setState(() {
-      _query = '';
-    });
-    _searchFocusNode.requestFocus();
-  }
-
-  void _startVoiceSearch() {}
-
-  static const List<String> _months = [
-    'JAN',
-    'FEB',
-    'MAR',
-    'APR',
-    'MAY',
-    'JUN',
-    'JUL',
-    'AUG',
-    'SEP',
-    'OCT',
-    'NOV',
-    'DEC',
-  ];
-  //* Gotta change down here !
-
-  String get _todayLabel {
-    final now = DateTime.now();
-    return 'TODAY, ${now.day} ${_months[now.month - 1]}';
-  }
-
-  String get _initial {
-    final name = widget.userName.trim();
-    return name.isEmpty ? 'No name' : name[0].toUpperCase();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final iconColor = _isSearchFocused
+    final homeProvider = context.watch<HomescreenProvider>();
+    final iconColor = homeProvider.isSearchFocused
         ? Appcolors.primaryColor
         : Appcolors.grey500;
 
@@ -105,6 +33,7 @@ class _HomescreenState extends State<Homescreen> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.only(
                 bottom: MediaQuery.paddingOf(context).bottom + 24,
               ),
@@ -112,58 +41,63 @@ class _HomescreenState extends State<Homescreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 16),
-                  CupertinoSearchTextField(
-                    controller: _searchController,
-                    focusNode: _searchFocusNode,
-                    onChanged: _onSearchChanged,
-                    onSubmitted: _onSearchSubmitted,
-                    placeholder: 'Search (notes, tasks)',
-                    placeholderStyle: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                      color: Appcolors.grey500,
-                    ),
-                    style: TextStyle(
-                      fontFamily: 'Inter',
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                      color: isDark ? Appcolors.white : Appcolors.grey900,
-                    ),
-                    cursorColor: Appcolors.primaryColor,
-                    padding: const EdgeInsets.symmetric(vertical: 17),
-                    decoration: BoxDecoration(
-                      color: isDark ? Appcolors.grey800 : Appcolors.grey100,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: _isSearchFocused
-                            ? Appcolors.primaryColor
-                            : Colors.transparent,
-                        width: 2,
+                  ScrollNotificationObserver(
+                    child: CupertinoSearchTextField(
+                      controller: homeProvider.searchController,
+                      focusNode: homeProvider.searchFocusNode,
+                      onChanged: (value) => context
+                          .read<HomescreenProvider>()
+                          .onSearchChanged(value),
+                      onSubmitted: (value) => context
+                          .read<HomescreenProvider>()
+                          .onSearchSubmitted(value),
+                      placeholder: 'Search (notes, tasks)',
+                      placeholderStyle: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 15,
+                        fontWeight: FontWeight.w400,
+                        color: Appcolors.grey500,
                       ),
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: isDark ? Appcolors.white : Appcolors.grey900,
+                      ),
+                      cursorColor: Appcolors.primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 17),
+                      decoration: BoxDecoration(
+                        color: isDark ? Appcolors.grey800 : Appcolors.grey100,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: homeProvider.isSearchFocused
+                              ? Appcolors.primaryColor
+                              : Colors.transparent,
+                          width: 2,
+                        ),
+                      ),
+                      prefixInsets: const EdgeInsetsDirectional.only(
+                        start: 16,
+                        end: 12,
+                      ),
+                      prefixIcon: SvgPicture.asset(
+                        Assets.icons.search.path,
+                        width: 20,
+                        height: 20,
+                        colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                      ),
+                      // Mic while empty, clear button once there is text.
+                      suffixMode: OverlayVisibilityMode.always,
+                      suffixIcon: homeProvider.query.isEmpty
+                          ? Icon(CupertinoIcons.mic, color: iconColor)
+                          : Icon(
+                              CupertinoIcons.xmark_circle_fill,
+                              color: Appcolors.grey500,
+                            ),
+                      onSuffixTap: () =>
+                          context.read<HomescreenProvider>().onSuffixTap(),
+                      suffixInsets: const EdgeInsetsDirectional.only(end: 16),
                     ),
-                    prefixInsets: const EdgeInsetsDirectional.only(
-                      start: 16,
-                      end: 12,
-                    ),
-                    prefixIcon: SvgPicture.asset(
-                      Assets.icons.search.path,
-                      width: 20,
-                      height: 20,
-                      colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-                    ),
-                    // Mic while empty, clear button once there is text.
-                    suffixMode: OverlayVisibilityMode.always,
-                    suffixIcon: _query.isEmpty
-                        ? Icon(CupertinoIcons.mic, color: iconColor)
-                        : Icon(
-                            CupertinoIcons.xmark_circle_fill,
-                            color: Appcolors.grey500,
-                          ),
-                    onSuffixTap: _query.isEmpty
-                        ? _startVoiceSearch
-                        : _clearSearch,
-                    suffixInsets: const EdgeInsetsDirectional.only(end: 16),
                   ),
                   const SizedBox(height: 24),
                   Row(
@@ -173,7 +107,7 @@ class _HomescreenState extends State<Homescreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _todayLabel,
+                              homeProvider.todayLabel,
                               style: TextStyle(
                                 fontFamily: 'Inter',
                                 fontSize: 13,
@@ -184,7 +118,7 @@ class _HomescreenState extends State<Homescreen> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'Welcome, ${widget.userName}!',
+                              'Welcome, $userName!',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -225,7 +159,7 @@ class _HomescreenState extends State<Homescreen> {
                         ),
                         child: Center(
                           child: Text(
-                            _initial,
+                            homeProvider.initialOf(userName),
                             style: TextStyle(
                               fontFamily: 'Inter',
                               fontSize: 18,
@@ -284,7 +218,6 @@ class _HomescreenState extends State<Homescreen> {
                     duration: '20 min',
                     onTap: () {},
                   ),
-                  
                 ],
               ),
             ),

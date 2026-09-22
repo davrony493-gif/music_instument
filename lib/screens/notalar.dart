@@ -41,7 +41,6 @@ class Notalar extends StatelessWidget {
       },
 
       child: Scaffold(
-      
         floatingActionButton: Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.paddingOf(context).bottom,
@@ -51,7 +50,10 @@ class Notalar extends StatelessWidget {
             shape: const CircleBorder(),
             foregroundColor: Appcolors.primaryColor,
             onPressed: () {},
-            child: SvgPicture.asset(Assets.icons.plus.path, color: Appcolors.white,),
+            child: SvgPicture.asset(
+              Assets.icons.plus.path,
+              color: Appcolors.white,
+            ),
           ),
         ),
         backgroundColor: isDark ? Appcolors.black : const Color(0xFFF2F2F7),
@@ -110,60 +112,62 @@ class Notalar extends StatelessWidget {
             ),
             child: Column(
               children: [
-                CupertinoSearchTextField(
-                  controller: notesProvider.searchController,
-                  focusNode: notesProvider.searchFocusNode,
-                  onChanged: (value) =>
-                      context.read<NotesProvider>().findInfo(value),
-                  onSubmitted: (value) =>
-                      context.read<NotesProvider>().findInfoDone(value),
-                  onSuffixTap: () => context.read<NotesProvider>().clean(),
-                  placeholder: 'Composer or piece name...',
-                  placeholderStyle: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w400,
-                    color: Appcolors.grey500,
-                  ),
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: isDark ? Appcolors.white : Appcolors.grey900,
-                  ),
-                  cursorColor: Appcolors.primaryColor,
-                  padding: const EdgeInsets.symmetric(vertical: 17),
-                  decoration: BoxDecoration(
-                    color: isDark ? Appcolors.grey800 : const Color(0xFFE8E9ED),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: notesProvider.isSearchFocused
-                          ? Appcolors.primaryColor
-                          : Colors.transparent,
-                      width: 2,
+                ScrollNotificationObserver(
+                  child: CupertinoSearchTextField(
+                    controller: notesProvider.searchController,
+                    focusNode: notesProvider.searchFocusNode,
+                    onChanged: (value) =>
+                        context.read<NotesProvider>().findInfo(value),
+                    onSubmitted: (value) =>
+                        context.read<NotesProvider>().findInfoDone(value),
+                    onSuffixTap: () => context.read<NotesProvider>().clean(),
+                    placeholder: 'Composer or piece name...',
+                    placeholderStyle: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                      color: Appcolors.grey500,
                     ),
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? Appcolors.white : Appcolors.grey900,
+                    ),
+                    cursorColor: Appcolors.primaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 17),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Appcolors.grey800
+                          : const Color(0xFFE8E9ED),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: notesProvider.isSearchFocused
+                            ? Appcolors.primaryColor
+                            : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    prefixInsets: const EdgeInsetsDirectional.only(
+                      start: 16,
+                      end: 12,
+                    ),
+                    prefixIcon: SvgPicture.asset(
+                      Assets.icons.search.path,
+                      width: 20,
+                      height: 20,
+                      colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                    ),
+                    suffixInsets: const EdgeInsetsDirectional.only(end: 16),
+                    itemColor: Appcolors.grey500,
                   ),
-                  prefixInsets: const EdgeInsetsDirectional.only(
-                    start: 16,
-                    end: 12,
-                  ),
-                  prefixIcon: SvgPicture.asset(
-                    Assets.icons.search.path,
-                    width: 20,
-                    height: 20,
-                    colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-                  ),
-                  suffixInsets: const EdgeInsetsDirectional.only(end: 16),
-                  itemColor: Appcolors.grey500,
                 ),
                 SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity, // full width, 3 equal segments
                   child: CupertinoSlidingSegmentedControl<int>(
                     groupValue: notesProvider.tab,
-                    backgroundColor: const Color(
-                      0xFFE8E9ED,
-                    ), // track color from your image
+                    backgroundColor: const Color(0xFFE8E9ED),
                     thumbColor: Colors.white,
                     padding: const EdgeInsets.all(4),
                     onValueChanged: (value) =>
@@ -177,16 +181,15 @@ class Notalar extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
                 GridView.builder(
-                  shrinkWrap: true, 
-                  physics:  NeverScrollableScrollPhysics(), 
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: notesProvider.notes.length,
-                  gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 14,
-                        mainAxisSpacing: 14,
-                        childAspectRatio: 0.66, // card width ÷ height
-                      ),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 14,
+                    mainAxisSpacing: 14,
+                    childAspectRatio: 0.66, // card width ÷ height
+                  ),
                   itemBuilder: (context, index) {
                     final note = notesProvider.notes[index];
                     return Notecard(
