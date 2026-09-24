@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:music_intrument/consts/colors/appcolors.dart';
 import 'package:music_intrument/gen/assets.gen.dart';
+import 'package:music_intrument/providers/profile_provider.dart';
+import 'package:provider/provider.dart';
 
 class ProfileFrame extends StatefulWidget {
   const ProfileFrame({super.key});
@@ -14,6 +16,12 @@ class ProfileFrame extends StatefulWidget {
 class _ProfileFrameState extends State<ProfileFrame> {
   @override
   Widget build(BuildContext context) {
+    final profile = context.watch<ProfileProvider>();
+
+    Future<void> pick() async {
+      await context.read<ProfileProvider>().pickFromGallery();
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -34,21 +42,30 @@ class _ProfileFrameState extends State<ProfileFrame> {
                       padding: EdgeInsets.zero,
                     ),
                     child: GestureDetector(
-                      onTap: () {},
+                      onTap: pick,
                       child: SizedBox(
                         width: 88,
                         height: 88,
-                        child: Center(
-                          child: SvgPicture.asset(
-                            Assets.icons.user.path,
-                            width: 44,
-                            height: 44,
-                            colorFilter: const ColorFilter.mode(
-                              Color(0xFF8E9BAE),
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ),
+                        child: profile.hasAvatar
+                            ? ClipOval(
+                                child: Image.file(
+                                  profile.avatar!,
+                                  width: 88,
+                                  height: 88,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : Center(
+                                child: SvgPicture.asset(
+                                  Assets.icons.user.path,
+                                  width: 44,
+                                  height: 44,
+                                  colorFilter: const ColorFilter.mode(
+                                    Color(0xFF8E9BAE),
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -82,7 +99,7 @@ class _ProfileFrameState extends State<ProfileFrame> {
                           BlendMode.srcIn,
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: pick,
                     ),
                   ),
                 ),
@@ -92,10 +109,10 @@ class _ProfileFrameState extends State<ProfileFrame> {
         ),
         const SizedBox(height: 12),
         GestureDetector(
-          onTap: () {},
+          onTap: pick,
           child: Center(
             child: Text(
-              'Upload your image',
+              profile.hasAvatar ? 'Change your image' : 'Upload your image',
               style: TextStyle(
                 fontFamily: 'Inter',
                 color: Appcolors.primaryColor,

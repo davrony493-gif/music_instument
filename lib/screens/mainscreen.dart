@@ -85,7 +85,7 @@ class _MainscreenState extends State<Mainscreen> {
                   activeIcon: Icon(Icons.timer_rounded),
                   label: 'Mashq',
                 ),
-                // Icons.history has no outlined variant, so both states match.
+              
                 BottomNavigationBarItem(
                   icon: Icon(Icons.history_rounded),
                   activeIcon: Icon(Icons.history_rounded),

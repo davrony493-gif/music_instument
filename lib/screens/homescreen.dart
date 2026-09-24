@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:music_intrument/consts/colors/appcolors.dart';
 import 'package:music_intrument/gen/assets.gen.dart';
+import 'package:music_intrument/models/practice_session.dart';
 import 'package:music_intrument/providers/homescreen_provider.dart';
+import 'package:music_intrument/providers/profile_provider.dart';
+import 'package:music_intrument/providers/sessions_provider.dart';
 import 'package:music_intrument/widgets/practicecard.dart';
 import 'package:music_intrument/widgets/taskcard.dart';
 import 'package:provider/provider.dart';
@@ -13,13 +16,25 @@ class Homescreen extends StatelessWidget {
 
   final String userName;
 
+  /// Removes a swiped session.
+  Future<void> _delete(BuildContext context, PracticeSession session) async {
+    final id = session.id;
+    if (id == null) return;
+
+    await context.read<SessionsProvider>().remove(id);
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final homeProvider = context.watch<HomescreenProvider>();
+    final sessions = context.watch<SessionsProvider>();
+    final profile = context.watch<ProfileProvider>();
     final iconColor = homeProvider.isSearchFocused
         ? Appcolors.primaryColor
         : Appcolors.grey500;
+    final query = homeProvider.query;
+    final results = sessions.matching(query);
 
     return GestureDetector(
       onTap: () {
@@ -27,13 +42,12 @@ class Homescreen extends StatelessWidget {
       },
       child: Scaffold(
         body: SafeArea(
-          // extendBody on Mainscreen inflates MediaQuery bottom padding to the
-          // nav bar height; opting out lets content scroll behind the glass.
+        
           bottom: false,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
+              //physics: const AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.only(
                 bottom: MediaQuery.paddingOf(context).bottom + 24,
               ),
@@ -86,7 +100,6 @@ class Homescreen extends StatelessWidget {
                         height: 20,
                         colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
                       ),
-                      // Mic while empty, clear button once there is text.
                       suffixMode: OverlayVisibilityMode.always,
                       suffixIcon: homeProvider.query.isEmpty
                           ? Icon(CupertinoIcons.mic, color: iconColor)
@@ -157,25 +170,37 @@ class Homescreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Center(
-                          child: Text(
-                            homeProvider.initialOf(userName),
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Appcolors.white,
-                            ),
-                          ),
-                        ),
+                        // The gradient stays as the fallback behind the
+                        // initial; an uploaded picture covers it.
+                        child: profile.hasAvatar
+                            ? ClipOval(
+                                child: Image.file(
+                                  profile.avatar!,
+                                  width: 48,
+                                  height: 48,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : Center(
+                                child: Text(
+                                  homeProvider.initialOf(userName),
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: Appcolors.white,
+                                  ),
+                                ),
+                              ),
                       ),
                     ],
                   ),
                   SizedBox(height: 24),
                   Practicecard(
-                    completedHours: 8,
+                    // Derived from saved sessions; the goals stay fixed.
+                    completedHours: sessions.hoursThisWeek,
                     goalHours: 10,
-                    daysCompleted: 4,
+                    daysCompleted: sessions.daysPractisedThisWeek,
                     totalDays: 5,
                     dailyPlanMinutes: 45,
                   ),
@@ -197,27 +222,83 @@ class Homescreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  // Mock sessions until practice history is stored.
-                  Taskcard(
-                    title: 'Mozart — Sonata No. 16',
-                    when: 'Yesterday, 18:30',
-                    duration: '45 min',
-                    onTap: () {},
-                  ),
-                  const SizedBox(height: 12),
-                  Taskcard(
-                    title: 'Bach — Prelude in C',
-                    when: 'Yesterday, 09:15',
-                    duration: '30 min',
-                    onTap: () {},
-                  ),
-                  const SizedBox(height: 12),
-                  Taskcard(
-                    title: 'Scales — C major',
-                    when: 'Monday, 20:00',
-                    duration: '20 min',
-                    onTap: () {},
-                  ),
+                  if (sessions.isLoading)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (sessions.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 32),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Assets.lotties.music.lottie(
+                              width: 160,
+                              height: 160,
+                              fit: BoxFit.contain,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'No sessions yet. Start a practice session and\n'
+                              'save it to see it here.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: 'Inter',
+                                fontSize: 14,
+                                height: 1.5,
+                                color: Appcolors.grey500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else if (results.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 32),
+                      child: Center(
+                        child: Text(
+                          'No sessions match "$query".',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 14,
+                            height: 1.5,
+                            color: Appcolors.grey500,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    for (final session in results) ...[
+                      Dismissible(
+                        key: ValueKey(
+                          session.id ?? session.startedAt.microsecondsSinceEpoch,
+                        ),
+                        direction: DismissDirection.endToStart,
+                        onDismissed: (_) => _delete(context, session),
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 24),
+                          decoration: BoxDecoration(
+                            color: Appcolors.red,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Icon(
+                            Icons.delete_outline_rounded,
+                            color: Appcolors.white,
+                          ),
+                        ),
+                        child: Taskcard(
+                          title: session.title,
+                          when: session.whenLabel(),
+                          duration: session.durationLabel,
+                          onTap: () {},
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                 ],
               ),
             ),

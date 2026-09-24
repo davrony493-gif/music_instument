@@ -3,10 +3,12 @@ import 'package:music_intrument/mock/musical_instruments.dart';
 
 class SignUpProvider extends ChangeNotifier {
   SignUpProvider() {
+  
     // Rebuild the screen when a field gains or loses focus (icon colors).
     nameFocusNode.addListener(notifyListeners);
     instrumentFocusNode.addListener(notifyListeners);
   }
+
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
@@ -65,6 +67,7 @@ class SignUpProvider extends ChangeNotifier {
     }
     return true;
   }
+  
 
   @override
   void dispose() {

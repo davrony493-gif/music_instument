@@ -9,8 +9,12 @@ environment:
 dependencies:
   adaptive_theme: ^3.7.2
   animate_do: ^5.1.0
+  get_storage: ^2.1.1
   audio_service: ^0.18.19
   connectivity_plus: ^7.3.1
+  device_info_plus: ^12.1.0
+  audioplayers: ^6.5.1
+  file_selector: ^1.0.3
   native_glass_navbar: 1.0.3
   dotted_border: ^3.1.0
   flutter:
@@ -27,6 +31,9 @@ dependencies:
   video_player: ^2.11.1
   cupertino_icons: ^1.0.9
   flutter_rating_bar: ^4.0.1
+  adaptive_platform_ui: ^1.0.1
+  google_fonts: ^8.2.1
+  app_settings: ^9.0.0
 
 dev_dependencies:
   flutter_test:
@@ -67,6 +74,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - assets/lotties/
+    - assets/audio/
 
   fonts:
     - family: Inter

@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 class HomescreenProvider extends ChangeNotifier {
   HomescreenProvider() {
-    // Rebuild when the search field gains or loses focus (icon/border color).
+   
     searchFocusNode.addListener(notifyListeners);
   }
 
@@ -57,7 +57,7 @@ class HomescreenProvider extends ChangeNotifier {
 
   void startVoiceSearch() {}
 
-  // Mic while empty, clear button once there is text.
+  
   void onSuffixTap() {
     if (query.isEmpty) {
       startVoiceSearch();

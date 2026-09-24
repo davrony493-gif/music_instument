@@ -1,32 +1,18 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:music_intrument/consts/colors/appcolors.dart';
 import 'package:music_intrument/gen/assets.gen.dart';
 import 'package:music_intrument/providers/notes_provider.dart';
+import 'package:music_intrument/screens/live_session.dart';
 import 'package:music_intrument/widgets/notecard.dart';
 import 'package:provider/provider.dart';
 
 class Notalar extends StatelessWidget {
   const Notalar({super.key});
-
-  //!interesting part
-  Widget _segment(String label, bool selected) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontFamily: 'Inter',
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: selected ? Appcolors.grey900 : Appcolors.grey500,
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,11 +31,23 @@ class Notalar extends StatelessWidget {
           padding: EdgeInsets.only(
             bottom: MediaQuery.paddingOf(context).bottom,
           ),
+          // The FAB is its own Hero — wrapping it in another one trips
+          // "a Hero widget cannot be the descendant of another Hero widget".
           child: FloatingActionButton(
+            heroTag: 'tag',
             tooltip: 'Add notes ? ',
             shape: const CircleBorder(),
             foregroundColor: Appcolors.primaryColor,
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  transitionDuration: Duration(seconds: 1),
+                  reverseTransitionDuration: Duration(milliseconds: 500),
+                  pageBuilder: (contex, animation, child) => LiveSession(),
+                ),
+              );
+            },
             child: SvgPicture.asset(
               Assets.icons.plus.path,
               color: Appcolors.white,
@@ -164,26 +162,35 @@ class Notalar extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 SizedBox(
-                  width: double.infinity, // full width, 3 equal segments
-                  child: CupertinoSlidingSegmentedControl<int>(
-                    groupValue: notesProvider.tab,
-                    backgroundColor: const Color(0xFFE8E9ED),
-                    thumbColor: Colors.white,
-                    padding: const EdgeInsets.all(4),
+                  width: double.infinity,
+                  child: AdaptiveSegmentedControl(
+                    selectedIndex: notesProvider.tab,
+                    labels: ['All', 'Favourites', 'Latest'],
+
                     onValueChanged: (value) =>
-                        context.read<NotesProvider>().setTab(value!),
-                    children: {
-                      0: _segment('All', notesProvider.tab == 0),
-                      1: _segment('Favourite', notesProvider.tab == 1),
-                      2: _segment("Latest", notesProvider.tab == 2),
-                    },
+                        context.read<NotesProvider>().setTab(value),
                   ),
                 ),
                 SizedBox(height: 20),
+                if (notesProvider.isSearching &&
+                    notesProvider.visibleNotes.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    child: Text(
+                      'No notes match "${notesProvider.quest}".',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 14,
+                        height: 1.5,
+                        color: Appcolors.grey500,
+                      ),
+                    ),
+                  ),
                 GridView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: notesProvider.notes.length,
+                  itemCount: notesProvider.visibleNotes.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 14,
@@ -191,15 +198,15 @@ class Notalar extends StatelessWidget {
                     childAspectRatio: 0.66, // card width ÷ height
                   ),
                   itemBuilder: (context, index) {
-                    final note = notesProvider.notes[index];
+                    final note = notesProvider.visibleNotes[index];
                     return Notecard(
                       title: note['title'],
                       details: note['details'],
                       isChord: note['type'] == 'chord',
                       pageCount: note['pages'],
-                      isFavorite: note['favorite'],
+                      isFavorite: notesProvider.isFavorite(note),
                       onFavoriteTap: () {
-                        context.read<NotesProvider>().toggleFavorite(index);
+                        context.read<NotesProvider>().toggleFavorite(note);
                       },
                     );
                   },

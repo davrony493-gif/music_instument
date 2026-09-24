@@ -1,4 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Install-time permissions: granted automatically, no runtime prompt. -->
+    <!-- Release builds do not inherit the debug/profile manifests, so network
+         access has to be declared here too. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Also merged in by connectivity_plus; declared here so this manifest
+         states what the app actually uses. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- Gallery access for the profile picture. Split by API level: 33+ uses
+         READ_MEDIA_IMAGES, everything older uses READ_EXTERNAL_STORAGE, which
+         is capped so it is not requested on versions that ignore it. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32"/>
     <application
         android:label="music_intrument"
         android:name="${applicationName}"

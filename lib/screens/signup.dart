@@ -1,6 +1,7 @@
 // ignore_for_file: unused_element, deprecated_member_use, prefer_final_fields, unused_field
 
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:music_intrument/consts/colors/appcolors.dart';
 import 'package:music_intrument/gen/assets.gen.dart';
 import 'package:music_intrument/providers/sign_up_provider.dart';
@@ -9,20 +10,27 @@ import 'package:music_intrument/widgets/profile_frame.dart';
 import 'package:music_intrument/widgets/signup_textfields.dart';
 import 'package:provider/provider.dart';
 
-class Signup extends StatelessWidget {
+class Signup extends StatefulWidget {
   const Signup({super.key});
 
-  void _submit(BuildContext context) {
+  @override
+  State<Signup> createState() => _SignupState();
+}
+
+class _SignupState extends State<Signup> {
+  void _submit() {
     final signUp = context.read<SignUpProvider>();
     if (!signUp.validateForm()) {
       return;
     }
 
-    // Captured now: the controller is disposed once this screen is replaced.
+    
+    GetStorage().write('userName', signUp.name);
+
+   
     Navigator.pushReplacement(context, _mainscreenRoute(signUp.name));
   }
 
-  /// Fades and lifts the main screen into place instead of snapping to it.
   Route<void> _mainscreenRoute(String userName) {
     const curve = Curves.easeOutCubic;
 
@@ -106,9 +114,12 @@ class Signup extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Image.asset(
-                          Assets.images.logo.path,
-                          fit: BoxFit.cover,
+                        child: Hero(
+                          tag: 'logo',
+                          child: Image.asset(
+                            Assets.images.logo.path,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),
@@ -161,7 +172,7 @@ class Signup extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        onPressed: () => _submit(context),
+                        onPressed: _submit,
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
