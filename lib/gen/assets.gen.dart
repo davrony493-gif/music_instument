@@ -34,9 +34,16 @@ class $AssetsIconsGen {
   /// File path: assets/icons/SVG.svg
   SvgGenImage get svg => const SvgGenImage('assets/icons/SVG.svg');
 
+  /// File path: assets/icons/activity.svg
+  SvgGenImage get activity => const SvgGenImage('assets/icons/activity.svg');
+
   /// File path: assets/icons/arrow-right.svg
   SvgGenImage get arrowRight =>
       const SvgGenImage('assets/icons/arrow-right.svg');
+
+  /// File path: assets/icons/calendar-days.svg
+  SvgGenImage get calendarDays =>
+      const SvgGenImage('assets/icons/calendar-days.svg');
 
   /// File path: assets/icons/check.svg
   SvgGenImage get check => const SvgGenImage('assets/icons/check.svg');
@@ -62,6 +69,17 @@ class $AssetsIconsGen {
 
   /// File path: assets/icons/metronome.svg
   SvgGenImage get metronome => const SvgGenImage('assets/icons/metronome.svg');
+
+  /// File path: assets/icons/music-note.svg
+  SvgGenImage get musicNote => const SvgGenImage('assets/icons/music-note.svg');
+
+  /// File path: assets/icons/music-notes-double.svg
+  SvgGenImage get musicNotesDouble =>
+      const SvgGenImage('assets/icons/music-notes-double.svg');
+
+  /// File path: assets/icons/music-notes.svg
+  SvgGenImage get musicNotes =>
+      const SvgGenImage('assets/icons/music-notes.svg');
 
   /// File path: assets/icons/music.svg
   SvgGenImage get music => const SvgGenImage('assets/icons/music.svg');
@@ -93,7 +111,9 @@ class $AssetsIconsGen {
   /// List of all assets
   List<SvgGenImage> get values => [
     svg,
+    activity,
     arrowRight,
+    calendarDays,
     check,
     chevronDown,
     clock,
@@ -102,6 +122,9 @@ class $AssetsIconsGen {
     file,
     home,
     metronome,
+    musicNote,
+    musicNotesDouble,
+    musicNotes,
     music,
     pause,
     play,

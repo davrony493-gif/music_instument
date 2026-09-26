@@ -21,6 +21,7 @@ class NotesProvider extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
+  
   final List<Map<String, dynamic>> notes = [
     {
       'id': 'beethoven-moonlight-sonata',
@@ -28,6 +29,10 @@ class NotesProvider extends ChangeNotifier {
       'details': 'C# minor · 1.4 MB',
       'type': 'pdf',
       'pages': 4,
+      'videoUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/transcoded/9/92/Moonlight_Beetoven_%28first_draft_played_by_Jason_Han%29.webm/Moonlight_Beetoven_%28first_draft_played_by_Jason_Han%29.webm.360p.mpeg4.mov',
+      'videoCaption': '3rd movement, Presto agitato',
+      'videoCredit': 'Jason M. C. Han · CC BY-SA 3.0 · Wikimedia Commons',
     },
     {
       'id': 'vivaldi-summer-presto',
@@ -48,6 +53,10 @@ class NotesProvider extends ChangeNotifier {
       'title': 'Uzbek National Melodies (Set)',
       'details': 'Tanovar, Munojot · 3.1 MB',
       'type': 'chord',
+      'videoUrl':
+          'https://upload.wikimedia.org/wikipedia/commons/transcoded/4/49/Do%CA%BBmbira_chalayotgan_musiqachi.webm/Do%CA%BBmbira_chalayotgan_musiqachi.webm.360p.mpeg4.mov',
+      'videoCaption': "Do'mbira at the Fozil Yo'ldosh o'g'li museum",
+      'videoCredit': 'Humoyun Qodirov · CC BY-SA 4.0 · Wikimedia Commons',
     },
   ];
 
@@ -121,7 +130,6 @@ class NotesProvider extends ChangeNotifier {
         await _repository.addFavorite(id);
       }
     } catch (_) {
-     
       _favoriteIds = previous;
       notifyListeners();
       rethrow;

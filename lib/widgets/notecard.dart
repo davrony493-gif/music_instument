@@ -12,14 +12,16 @@ class Notecard extends StatelessWidget {
     this.isChord = false,
     this.isFavorite = false,
     this.onFavoriteTap,
+    this.onTap,
   });
 
   final String title;
   final String details;
-  final int? pageCount; 
-  final bool isChord; 
+  final int? pageCount;
+  final bool isChord;
   final bool isFavorite;
   final VoidCallback? onFavoriteTap;
+  final VoidCallback? onTap;
 
   static const Color _pdfRed = Color(0xFFDD524C);
   static const Color _chordBlue = Color(0xFF3662E3);
@@ -28,26 +30,31 @@ class Notecard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Appcolors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Appcolors.grey100),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.white,
-            blurRadius: 5,
-            spreadRadius: 1,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+   
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Appcolors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Appcolors.grey100),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.white,
+              blurRadius: 5,
+              spreadRadius: 1,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
 
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [_buildPreview(), _buildInfo()],
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [_buildPreview(), _buildInfo()],
+        ),
       ),
     );
   }
@@ -119,7 +126,7 @@ class Notecard extends StatelessWidget {
     return GestureDetector(
       onTap: onFavoriteTap,
       child: RatingBarIndicator(
-        rating: 1, 
+        rating: 1,
         itemCount: 1,
         itemSize: 22,
         itemBuilder: (context, index) => isFavorite

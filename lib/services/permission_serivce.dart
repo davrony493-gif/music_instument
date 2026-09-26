@@ -17,10 +17,7 @@ class PermissionSerivce {
       debugPrint('gallery permission status -> $status');
       if (status.isGranted || status.isLimited) return GalleryPermission.granted;
 
-      // Only a settled refusal skips the prompt. Anything else - including
-      // restricted - still gets asked, because on iOS an unanswered
-      // permission reports as denied and must reach request() to show the
-      // system sheet.
+      
       if (status.isPermanentlyDenied) return GalleryPermission.permanentlyDenied;
 
       final result = await permission.request();

@@ -8,6 +8,9 @@ class PracticeSession {
     this.laps = const [],
   });
 
+  /// Title of a session practised without a chosen track.
+  static const String untitled = 'Practice session';
+
   final int? id;
   final String title;
   final DateTime startedAt;

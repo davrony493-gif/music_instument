@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:music_intrument/consts/colors/appcolors.dart';
 import 'package:music_intrument/models/practice_session.dart';
 import 'package:music_intrument/providers/live_session_provider.dart';
+import 'package:music_intrument/providers/metronome_provider.dart';
 import 'package:music_intrument/providers/track_provider.dart';
 import 'package:music_intrument/widgets/metronome_card.dart';
+import 'package:music_intrument/widgets/top_snackbar.dart';
 import 'package:music_intrument/widgets/track_card.dart';
 import 'package:music_intrument/providers/sessions_provider.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +51,8 @@ class LiveSession extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: background,
         scrolledUnderElevation: 0,
-        leading: Hero(tag: 'tag', child: const BackButton()),
+        // A nav bar tab, not a pushed page: there is nothing to go back to.
+        automaticallyImplyLeading: false,
         title: const Text('Train session'),
         actions: const [_SaveAction()],
         titleTextStyle: TextStyle(
@@ -59,6 +64,8 @@ class LiveSession extends StatelessWidget {
         centerTitle: true,
       ),
       body: SafeArea(
+        
+        bottom: false,
         child: SingleChildScrollView(
           padding: EdgeInsets.only(
             bottom: MediaQuery.paddingOf(context).bottom + 24,
@@ -383,37 +390,22 @@ class _SaveActionState extends State<_SaveAction> {
     if (_saving) return;
 
     final live = context.read<LiveSessionProvider>();
+    final messenger = TopSnackbar.of(context);
 
     if (!live.hasSession) {
-      ScaffoldMessenger.of(context)
-       
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            
-            backgroundColor: Appcolors.red,
-            content: Text(
-              'Nothing to save yet — press play to start.',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Appcolors.white,
-              ),
-            ),
-          ),
-        );
+      messenger.show(
+        'Nothing to save yet — press play to start.',
+        isError: true,
+      );
       return;
     }
 
-   
     live.pause();
     final elapsed = live.elapsed;
     final laps = live.laps;
 
-   
-    final track = context.read<TrackProvider>().title;
-    final title = track ?? 'Practice session';
+    final track = context.read<TrackProvider>();
+    final title = track.title ?? PracticeSession.untitled;
 
     final practice = PracticeSession(
       title: title,
@@ -423,16 +415,29 @@ class _SaveActionState extends State<_SaveAction> {
       laps: laps,
     );
 
+    // Read before the await: the user can switch tabs while it saves.
+    final sessions = context.read<SessionsProvider>();
+    final metronome = context.read<MetronomeProvider>();
+
     setState(() => _saving = true);
     try {
-      await context.read<SessionsProvider>().save(practice);
-      live.reset();
-
-      // Back to where the session was started from.
-      if (mounted) Navigator.of(context).pop();
+      await sessions.save(practice);
+    } catch (error) {
+      // Nothing has been reset, so the session is still there to retry.
+      debugPrint('Saving the practice session failed: $error');
+      messenger.show('Could not save the session. Try again.', isError: true);
+      return;
     } finally {
       if (mounted) setState(() => _saving = false);
     }
+
+    // The tab stays open, so empty it for the next session: timer and marks,
+    // the chosen music, and the metronome's click.
+    live.reset();
+    metronome.stop();
+    unawaited(track.clear());
+
+    messenger.show('Session saved · ${practice.durationLabel}');
   }
 
   @override

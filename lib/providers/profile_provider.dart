@@ -7,7 +7,7 @@ import 'package:music_intrument/services/permission_serivce.dart';
 
 enum PickResult { saved, cancelled, denied, permanentlyDenied }
 
-/// The avatar, shared between sign-up and the home screen.
+
 class ProfileProvider extends ChangeNotifier {
   ProfileProvider({AvatarService? service, ImagePicker? picker})
     : _service = service ?? AvatarService(),
@@ -42,7 +42,7 @@ class ProfileProvider extends ChangeNotifier {
         break;
     }
 
-    // Downscaled on the way in: the largest this is ever drawn is 88px.
+    
     final picked = await _picker.pickImage(
       source: ImageSource.gallery,
       maxWidth: 512,

@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:music_intrument/consts/colors/appcolors.dart';
 import 'package:music_intrument/gen/assets.gen.dart';
 
-/// A single finished practice session in the "Previous tasks" list.
 class Taskcard extends StatelessWidget {
   const Taskcard({
     super.key,
@@ -39,7 +38,7 @@ class Taskcard extends StatelessWidget {
           ),
         ],
       ),
-      // Material sits above the decoration so the ink ripple stays visible.
+     
       child: Material(
         color: Colors.transparent,
         child: ListTile(
@@ -81,7 +80,7 @@ class Taskcard extends StatelessWidget {
               color: titleColor,
             ),
           ),
-          // One paragraph rather than a Row, so it ellipsizes as a unit.
+         
           subtitle: Padding(
             padding: const EdgeInsets.only(top: 3),
             child: Text.rich(

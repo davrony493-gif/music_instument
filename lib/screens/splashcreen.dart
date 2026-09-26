@@ -16,8 +16,6 @@ class Onborading extends StatefulWidget {
 
 class _OnboradingState extends State<Onborading>
     with SingleTickerProviderStateMixin {
-  // Runs once on entry; finishes ~400ms before the push below, so the Hero
-  // flight to Signup starts from a settled, fully opaque logo.
   late final AnimationController _entrance = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 600),
@@ -28,12 +26,11 @@ class _OnboradingState extends State<Onborading>
     curve: Curves.easeOut,
   );
 
-  late final Animation<double> _scale =
-      Tween<double>(begin: 0.85, end: 1).animate(
-        CurvedAnimation(parent: _entrance, curve: Curves.easeOutBack),
-      );
+  late final Animation<double> _scale = Tween<double>(
+    begin: 0.85,
+    end: 1,
+  ).animate(CurvedAnimation(parent: _entrance, curve: Curves.easeOutBack));
 
-  // Trails the logo so the wave arrives under a settled mark.
   late final Animation<double> _waveFade = CurvedAnimation(
     parent: _entrance,
     curve: const Interval(0.5, 1, curve: Curves.easeOut),
@@ -42,8 +39,7 @@ class _OnboradingState extends State<Onborading>
   @override
   void initState() {
     super.initState();
-    // Asked once, on entry. The system sheet draws over the splash, and
-    // returns immediately on later launches because the choice is stored.
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       PermissionSerivce.requestGallery();
     });
@@ -51,7 +47,6 @@ class _OnboradingState extends State<Onborading>
     Future.delayed(const Duration(milliseconds: 1800), () {
       if (!mounted) return;
 
-      // Saved by Signup after the first successful Continue.
       final savedName = GetStorage().read<String>('userName');
       Navigator.pushReplacement(
         context,
@@ -72,7 +67,6 @@ class _OnboradingState extends State<Onborading>
             return FadeTransition(
               opacity: curved,
               child: SlideTransition(
-                // Starts 15% of the screen to the right, not fully off-screen.
                 position: Tween<Offset>(
                   begin: const Offset(0.15, 0),
                   end: Offset.zero,
@@ -100,8 +94,6 @@ class _OnboradingState extends State<Onborading>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Only the logo is the Hero — the wave stays behind and fades
-              // out with the page, so the flight to Signup is unchanged.
               Hero(
                 tag: 'logo',
                 child: FadeTransition(

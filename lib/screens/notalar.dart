@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +5,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:music_intrument/consts/colors/appcolors.dart';
 import 'package:music_intrument/gen/assets.gen.dart';
 import 'package:music_intrument/providers/notes_provider.dart';
-import 'package:music_intrument/screens/live_session.dart';
+import 'package:music_intrument/screens/note_detail.dart';
 import 'package:music_intrument/widgets/notecard.dart';
 import 'package:provider/provider.dart';
 
@@ -27,33 +25,6 @@ class Notalar extends StatelessWidget {
       },
 
       child: Scaffold(
-        floatingActionButton: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.paddingOf(context).bottom,
-          ),
-          // The FAB is its own Hero — wrapping it in another one trips
-          // "a Hero widget cannot be the descendant of another Hero widget".
-          child: FloatingActionButton(
-            heroTag: 'tag',
-            tooltip: 'Add notes ? ',
-            shape: const CircleBorder(),
-            foregroundColor: Appcolors.primaryColor,
-            onPressed: () {
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  transitionDuration: Duration(seconds: 1),
-                  reverseTransitionDuration: Duration(milliseconds: 500),
-                  pageBuilder: (contex, animation, child) => LiveSession(),
-                ),
-              );
-            },
-            child: SvgPicture.asset(
-              Assets.icons.plus.path,
-              color: Appcolors.white,
-            ),
-          ),
-        ),
         backgroundColor: isDark ? Appcolors.black : const Color(0xFFF2F2F7),
         appBar: AppBar(
           backgroundColor: isDark ? Appcolors.black : const Color(0xFFF2F2F7),
@@ -208,6 +179,11 @@ class Notalar extends StatelessWidget {
                       onFavoriteTap: () {
                         context.read<NotesProvider>().toggleFavorite(note);
                       },
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => NoteDetail(note: note),
+                        ),
+                      ),
                     );
                   },
                 ),

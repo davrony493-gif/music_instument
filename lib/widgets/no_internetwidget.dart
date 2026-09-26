@@ -13,7 +13,7 @@ class NoInternet extends StatelessWidget {
 
   static const Duration _duration = Duration(milliseconds: 250);
 
-  /// Re-runs the connectivity check. Wired up from `main.dart`.
+  
   static Future<void> Function()? onRetry;
 
   static bool get isOpen => _visible.value;
@@ -22,14 +22,13 @@ class NoInternet extends StatelessWidget {
 
   static void dismiss() => _visible.value = false;
 
-  /// Wraps the app: `builder: (context, child) => NoInternet.gate(child)`.
+  
   static Widget gate(Widget? child) =>
       _NoInternetGate(child: child ?? const SizedBox.shrink());
 
   @override
   Widget build(BuildContext context) {
-    // Drawn above the navigator, where there is no Material ancestor, so
-    // text would otherwise fall back to the unstyled default.
+  
     return const Material(
       type: MaterialType.transparency,
       child: _OfflineSheet(),
@@ -157,8 +156,7 @@ class _OfflineSheetState extends State<_OfflineSheet> {
                     ),
                   ),
                   child: _retrying
-                      // Same footprint as the label, so the button does not
-                      // resize while checking.
+                    
                       ? SizedBox(
                           width: 20,
                           height: 20,

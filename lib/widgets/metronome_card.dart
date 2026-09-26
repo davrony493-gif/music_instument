@@ -98,55 +98,92 @@ class MetronomeCard extends StatelessWidget {
                   context.read<MetronomeProvider>().setBpm(value.round()),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              for (final mark in _marks)
-                Text(
-                  '${mark.name} (${mark.bpm})',
-                  style: GoogleFonts.robotoMono(
-                    fontSize: 12,
-                    fontWeight: _isNearest(metronome.bpm, mark.bpm)
-                        ? FontWeight.w700
-                        : FontWeight.w400,
-                    color: _isNearest(metronome.bpm, mark.bpm)
-                        ? Appcolors.primaryColor
-                        : Appcolors.grey500,
+        
+          _ShrinkToFit(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                for (final mark in _marks)
+                  Text(
+                    '${mark.name} (${mark.bpm})',
+                    style: GoogleFonts.robotoMono(
+                      fontSize: 12,
+                      fontWeight: _isNearest(metronome.bpm, mark.bpm)
+                          ? FontWeight.w700
+                          : FontWeight.w400,
+                      color: _isNearest(metronome.bpm, mark.bpm)
+                          ? Appcolors.primaryColor
+                          : Appcolors.grey500,
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              for (var i = 0; i < MetronomeProvider.signatures.length; i++) ...[
-                _SignatureChip(
-                  label: MetronomeProvider.signatures[i].label,
-                  selected: metronome.signatureIndex == i,
-                  onTap: () =>
-                      context.read<MetronomeProvider>().setSignature(i),
+        
+          _ShrinkToFit(
+            child: Row(
+            
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (
+                      var i = 0;
+                      i < MetronomeProvider.signatures.length;
+                      i++
+                    ) ...[
+                      _SignatureChip(
+                        label: MetronomeProvider.signatures[i].label,
+                        selected: metronome.signatureIndex == i,
+                        onTap: () =>
+                            context.read<MetronomeProvider>().setSignature(i),
+                      ),
+                      const SizedBox(width: 10),
+                    ],
+                  ],
                 ),
-                const SizedBox(width: 10),
+                _PlayPill(
+                  isRunning: metronome.isRunning,
+                  onTap: context.read<MetronomeProvider>().toggle,
+                ),
               ],
-              const Spacer(),
-              _PlayPill(
-                isRunning: metronome.isRunning,
-                onTap: context.read<MetronomeProvider>().toggle,
-              ),
-            ],
+            ),
           ),
         ],
       ),
     );
   }
 
-  /// Bolds whichever tempo marking the current bpm sits closest to.
+ 
   static bool _isNearest(int bpm, int markBpm) {
     var best = _marks.first.bpm;
     for (final mark in _marks) {
       if ((bpm - mark.bpm).abs() < (bpm - best).abs()) best = mark.bpm;
     }
     return best == markBpm;
+  }
+}
+
+
+
+class _ShrinkToFit extends StatelessWidget {
+  const _ShrinkToFit({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) => FittedBox(
+        fit: BoxFit.scaleDown,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minWidth: constraints.maxWidth),
+          child: child,
+        ),
+      ),
+    );
   }
 }
 

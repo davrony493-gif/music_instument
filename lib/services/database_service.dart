@@ -10,8 +10,7 @@ abstract class SessionRepository {
 }
 
 
-/// Which notes the user has starred. Only the ids are stored — the notes
-/// themselves still come from [NotesProvider]'s hardcoded list.
+
 abstract class FavoritesRepository {
   Future<Set<String>> favoriteIds();
   Future<void> addFavorite(String noteId);
@@ -55,8 +54,7 @@ class DatabaseService implements SessionRepository, FavoritesRepository {
         await db.execute(_createSessions);
         await db.execute(_createFavorites);
       },
-      // Installs created at v1 already have the sessions table but not this
-      // one; without the upgrade they would hit "no such table".
+     
       onUpgrade: (db, oldVersion, newVersion) async {
         if (oldVersion < 2) await db.execute(_createFavorites);
       },

@@ -4,13 +4,11 @@ import 'package:get_storage/get_storage.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-/// The picked avatar, kept as a file on disk with only its name in storage.
+
 class AvatarService {
   static const String _key = 'avatarFile';
 
-  // Only the file name is stored. The documents directory is a different
-  // absolute path after an iOS update or reinstall, so a stored full path
-  // would point at nothing.
+  
   Future<File?> load() async {
     final name = GetStorage().read<String>(_key);
     if (name == null) return null;
@@ -24,12 +22,9 @@ class AvatarService {
     return file;
   }
 
-  /// [sourcePath] is the picker's own copy, which lives in a cache directory
-  /// the system is free to empty, so the bytes are copied somewhere durable.
   Future<File> save(String sourcePath) async {
     final dir = await getApplicationDocumentsDirectory();
-    // A fresh name each time: Image.file caches by path, so reusing one name
-    // would keep painting the previous picture.
+    
     final name =
         'avatar_${DateTime.now().millisecondsSinceEpoch}${p.extension(sourcePath)}';
     final saved = await File(sourcePath).copy(p.join(dir.path, name));

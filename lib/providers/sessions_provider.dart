@@ -35,6 +35,20 @@ class SessionsProvider extends ChangeNotifier {
         .toList();
   }
 
+  /// Sessions started on [day]'s calendar date, newest first.
+  List<PracticeSession> on(DateTime day) {
+    final date = _dayOf(day);
+    return _sessions.where((s) => _dayOf(s.startedAt) == date).toList();
+  }
+
+  /// Calendar dates (at midnight) with at least one session.
+  Set<DateTime> get practisedDays =>
+      _sessions.map((s) => _dayOf(s.startedAt)).toSet();
+
+  /// Everything ever practised.
+  Duration get totalDuration =>
+      _sessions.fold(Duration.zero, (sum, session) => sum + session.duration);
+
   /// Hours practised since Monday, for the weekly progress card.
   double get hoursThisWeek {
     final total = _thisWeek().fold(
@@ -45,10 +59,8 @@ class SessionsProvider extends ChangeNotifier {
   }
 
   /// Distinct days practised since Monday.
-  int get daysPractisedThisWeek => _thisWeek()
-      .map((s) => DateTime(s.startedAt.year, s.startedAt.month, s.startedAt.day))
-      .toSet()
-      .length;
+  int get daysPractisedThisWeek =>
+      _thisWeek().map((s) => _dayOf(s.startedAt)).toSet().length;
 
   Future<void> load() async {
     _isLoading = true;
@@ -71,6 +83,9 @@ class SessionsProvider extends ChangeNotifier {
     _sessions = _sessions.where((s) => s.id != id).toList();
     notifyListeners();
   }
+
+  static DateTime _dayOf(DateTime value) =>
+      DateTime(value.year, value.month, value.day);
 
   Iterable<PracticeSession> _thisWeek() {
     final now = DateTime.now();

@@ -7,11 +7,14 @@ import 'package:flutter/foundation.dart';
 class TrackProvider extends ChangeNotifier {
   TrackProvider() {
     _subs.addAll([
+     
       _player.onPositionChanged.listen((p) {
+        if (!hasTrack) return;
         _position = p;
         notifyListeners();
       }),
       _player.onDurationChanged.listen((d) {
+        if (!hasTrack) return;
         _duration = d;
         notifyListeners();
       }),
@@ -63,6 +66,19 @@ class TrackProvider extends ChangeNotifier {
     await _player.setSourceDeviceFile(_path!);
   }
 
+  
+  Future<void> clear() async {
+    if (_path == null) return;
+    _path = null;
+    _title = null;
+    _position = Duration.zero;
+    _duration = Duration.zero;
+    _isPlaying = false;
+    notifyListeners();
+
+    await _player.release();
+  }
+
   Future<void> toggle() async {
     if (_path == null) return;
     if (_isPlaying) {
@@ -70,6 +86,11 @@ class TrackProvider extends ChangeNotifier {
     } else {
       await _player.play(DeviceFileSource(_path!));
     }
+  }
+
+ 
+  Future<void> pause() async {
+    if (_isPlaying) await _player.pause();
   }
 
   Future<void> back() => _seekBy(-skip);

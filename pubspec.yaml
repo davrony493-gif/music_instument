@@ -79,4 +79,7 @@ flutter:
   fonts:
     - family: Inter
       fonts:
+        # Variable fonts (weight + optical size axes), from Google Fonts.
         - asset: assets/fonts/inter.ttf
+        - asset: assets/fonts/inter-italic.ttf
+          style: italic

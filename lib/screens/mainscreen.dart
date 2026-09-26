@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:music_intrument/consts/colors/appcolors.dart';
 import 'package:music_intrument/screens/history.dart';
 import 'package:music_intrument/screens/homescreen.dart';
-import 'package:music_intrument/screens/mashq.dart';
+import 'package:music_intrument/screens/live_session.dart';
 import 'package:music_intrument/screens/notalar.dart';
 import 'package:native_glass_navbar/native_glass_navbar.dart';
 
@@ -22,11 +22,11 @@ class Mainscreen extends StatefulWidget {
 
 class _MainscreenState extends State<Mainscreen> {
   int selected = 0;
- 
+
   late final List<Widget> _pages = [
     Homescreen(userName: widget.userName),
     const Notalar(),
-    const Mashq(),
+    const LiveSession(),
     const History(),
   ];
 
@@ -85,7 +85,7 @@ class _MainscreenState extends State<Mainscreen> {
                   activeIcon: Icon(Icons.timer_rounded),
                   label: 'Mashq',
                 ),
-              
+
                 BottomNavigationBarItem(
                   icon: Icon(Icons.history_rounded),
                   activeIcon: Icon(Icons.history_rounded),
@@ -100,8 +100,6 @@ class _MainscreenState extends State<Mainscreen> {
   }
 
   Widget _buildIosNavBar(BuildContext context) {
-   
-
     return NativeGlassNavBar(
       tintColor: Appcolors.primaryColor,
       currentIndex: selected,
@@ -114,8 +112,11 @@ class _MainscreenState extends State<Mainscreen> {
         NativeGlassNavBarItem(label: 'Main', symbol: 'square.grid.2x2'),
         NativeGlassNavBarItem(label: 'Notes', symbol: 'book'),
         NativeGlassNavBarItem(label: 'Tasks', symbol: 'timer'),
-       
-        NativeGlassNavBarItem(label: 'History', symbol: 'clock.arrow.circlepath'),
+
+        NativeGlassNavBarItem(
+          label: 'History',
+          symbol: 'clock.arrow.circlepath',
+        ),
       ],
     );
   }
